@@ -42,8 +42,7 @@ We have built a **simplified prototype** with the following working features:
 ---
 
 ## 📺 Demo Video  
-[![Demo Video](https://www.loom.com/share/42379a1543e74b04bb21dc1d6a5afbd8?sid=4f449052-09a5-4b08-b592-491cae6e59fa)  
-
+https://www.loom.com/share/42379a1543e74b04bb21dc1d6a5afbd8?sid=f315c5b7-51ae-42a1-94b2-45ddd3abaf89  
 ---
 
 ## 📸 Screenshot
