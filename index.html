@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Artisan AI Assistant - Prototype</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f7f9fb;color:#111;margin:0;padding:20px;}
+    .container{max-width:900px;margin:0 auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 6px 18px rgba(20,20,40,0.06);}
+    h1{font-size:20px;margin:0 0 12px;}
+    .row{display:flex;gap:16px;flex-wrap:wrap;}
+    .col{flex:1;min-width:260px;}
+    .box{background:#fbfdff;padding:12px;border-radius:8px;border:1px solid #eef4fb;}
+    input[type="file"]{display:block;margin-top:8px;}
+    button{background:#2563eb;color:white;border:none;padding:10px 12px;border-radius:6px;cursor:pointer;}
+    button.secondary{background:#10b981;}
+    img.preview{max-width:100%;border-radius:6px;display:block;margin:8px 0;}
+    label{font-weight:600;display:block;margin-top:8px;}
+    .output{background:#fff8e6;padding:10px;border-radius:6px;border:1px dashed #ffd699;margin-top:8px;}
+    textarea{width:100%;min-height:80px;border-radius:6px;padding:8px;border:1px solid #ddd;}
+    .small{font-size:13px;color:#555}
+    .controls{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .note{font-size:13px;color:#666;margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Artisan AI Assistant — Prototype</h1>
+    <p class="small">Simple prototype with 3 working features: Image preview & simulated enhancement, product story generation, and price suggestion.</p>
+
+    <div class="row">
+      <!-- Left Column -->
+      <div class="col">
+        <div class="box">
+          <label>1) Upload Product Photo</label>
+          <input id="imgInput" type="file" accept="image/*" />
+          <div id="previewWrap">
+            <img id="preview" class="preview" src="" alt="" style="display:none" />
+          </div>
+          <div class="controls">
+            <button id="enhanceBtn">Enhance Photo</button>
+            <button id="resetBtn" class="secondary">Reset</button>
+          </div>
+          <p class="note">Enhance applies simulated filters (brightness/sharpness) for demo purposes.</p>
+        </div>
+
+        <div class="box" style="margin-top:12px;">
+          <label>2) Product Details (for story & price)</label>
+          <input id="ptype" placeholder="Product type (e.g., Clay Pot)" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd" />
+          <input id="material" placeholder="Material (e.g., Terracotta)" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;margin-top:8px" />
+          <input id="location" placeholder="Artisan location (e.g., Jaipur)" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ddd;margin-top:8px" />
+          <label>Estimated base cost (₹)</label>
+          <input id="basecost" type="number" min="1" placeholder="e.g., 200" style="width:40%;padding:8px;border-radius:6px;border:1px solid #ddd" />
+          <div class="controls">
+            <button id="genStoryBtn">Generate Story & Caption</button>
+            <button id="priceBtn" class="secondary">Suggest Price</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="col">
+        <div class="box">
+          <label>Enhanced Photo Preview</label>
+          <div id="enhancedWrap" style="min-height:150px;border-radius:6px;background:#fff;padding:8px;border:1px solid #eee">
+            <img id="enhancedImg" class="preview" src="" alt="" style="display:none" />
+            <div id="noimg" class="small">No enhanced image yet.</div>
+          </div>
+
+          <div class="output" id="storyOut" style="display:none;margin-top:12px">
+            <strong>Product Title</strong>
+            <div id="titleText"></div>
+            <strong style="display:block;margin-top:8px">Product Story (EN)</strong>
+            <div id="storyText"></div>
+            <strong style="display:block;margin-top:8px">Product Story (HI) — mock</strong>
+            <div id="storyHI"></div>
+            <strong style="display:block;margin-top:8px">Social Caption</strong>
+            <div id="captionText"></div>
+          </div>
+
+          <div class="output" id="priceOut" style="display:none;margin-top:12px">
+            <strong>Suggested Price Range</strong>
+            <div id="priceText" style="font-size:18px;color:green"></div>
+            <div id="priceReason" class="small" style="margin-top:6px"></div>
+          </div>
+        </div>
+
+        <div class="box" style="margin-top:12px;">
+          <label>Quick Actions</label>
+          <div class="controls" style="margin-top:8px">
+            <button id="copyStory">Copy Story</button>
+            <button id="downloadImg" class="secondary">Download Enhanced Image</button>
+          </div>
+          <p class="note">This prototype is offline and uses templates — suitable for demo and hackathon pitch.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Image upload & preview
+const imgInput = document.getElementById('imgInput');
+const preview = document.getElementById('preview');
+const enhancedImg = document.getElementById('enhancedImg');
+const noimg = document.getElementById('noimg');
+
+imgInput.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const url = URL.createObjectURL(file);
+  preview.src = url; preview.style.display='block';
+  enhancedImg.src = url; enhancedImg.style.display='block';
+  noimg.style.display='none';
+});
+
+// Reset
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  imgInput.value=''; preview.src=''; preview.style.display='none';
+  enhancedImg.src=''; enhancedImg.style.display='none';
+  noimg.style.display='block';
+  document.getElementById('storyOut').style.display='none';
+  document.getElementById('priceOut').style.display='none';
+});
+
+// Enhance simulation
+document.getElementById('enhanceBtn').addEventListener('click', ()=>{
+  if(!enhancedImg.src){ alert('Upload an image first'); return; }
+  enhancedImg.style.filter = 'brightness(1.08) contrast(1.12) saturate(1.05)';
+  enhancedImg.style.boxShadow = '0 6px 18px rgba(0,0,0,0.12)';
+  document.getElementById('noimg').style.display='none';
+  alert('Photo enhanced (simulated).');
+});
+
+// Generate story
+document.getElementById('genStoryBtn').addEventListener('click', ()=>{
+  const ptype = document.getElementById('ptype').value || 'Handmade product';
+  const material = document.getElementById('material').value || 'natural materials';
+  const location = document.getElementById('location').value || 'local village';
+  const title = `${location} ${material} ${ptype}`;
+  const story = `This ${ptype.toLowerCase()} is handcrafted using ${material} by skilled artisans from ${location}. Each piece reflects traditional techniques and is made with care, ensuring unique character and sustainable materials.`;
+  const story_hi = `यह ${location} के कारीगरों द्वारा हाथ से बनाई गई ${ptype.toLowerCase()} है, जो ${material} का उपयोग करती है। हर टुकड़ा पारंपरिक तकनीक और देखभाल को दर्शाता है।`;
+  const caption = `Bring home a piece of ${location}'s craft — handcrafted & sustainable.`;
+  document.getElementById('titleText').innerText = title;
+  document.getElementById('storyText').innerText = story;
+  document.getElementById('storyHI').innerText = story_hi;
+  document.getElementById('captionText').innerText = caption;
+  document.getElementById('storyOut').style.display='block';
+});
+
+// Price suggestion
+document.getElementById('priceBtn').addEventListener('click', ()=>{
+  const base = parseFloat(document.getElementById('basecost').value) || 200;
+  let mult = 1.6;
+  const material = (document.getElementById('material').value||'').toLowerCase();
+  if(material.includes('gold')||material.includes('silver')) mult = 2.5;
+  if(material.includes('clay')||material.includes('terracotta')) mult = 1.6;
+  const low = Math.round(base * mult);
+  const high = Math.round(base * (mult+0.25));
+  document.getElementById('priceText').innerText = `₹ ${low} - ₹ ${high}`;
+  document.getElementById('priceReason').innerText = `Suggested based on base cost ₹${base} and material factor.`;
+  document.getElementById('priceOut').style.display='block';
+});
+
+// Copy story
+document.getElementById('copyStory').addEventListener('click', async ()=>{
+  const title = document.getElementById('titleText').innerText || '';
+  const story = document.getElementById('storyText').innerText || '';
+  const caption = document.getElementById('captionText').innerText || '';
+  const text = `${title}\n\n${story}\n\nCaption: ${caption}`;
+  try{
+    await navigator.clipboard.writeText(text);
+    alert('Story copied to clipboard.');
+  }catch(e){ alert('Copy failed — please copy manually.'); }
+});
+
+// Download enhanced image
+document.getElementById('downloadImg').addEventListener('click', ()=>{
+  if(!enhancedImg.src){ alert('No image to download'); return; }
+  const link = document.createElement('a');
+  link.href = enhancedImg.src;
+  link.download = 'enhanced_product.png';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+});
+</script>
+</body>
+</html>
